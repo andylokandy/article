@@ -50,8 +50,6 @@ pub enum Poll<T> {
 
 我们来看一个具体的例子，比如说我们正在打算从 `socket` 接收数据，我们得到了一个 `Async`，这时候 `socket` 可能还没准备好，所以第一次 `poll()` 返回了 `Poll::Pending`，这时我们必须把这个 `Async` 交给一个 `event loop` 保管（就比如说一个由 `futures-rs` 库提供的线程池 `ThreadPool`），以备过会 `socket` 准备好了再回来 `poll()`。
 
-解决了 who 的问题，那还有 when 问题。我们让 `ThreadPool` 来负责重新 `poll()` ，那到底什么时候 `poll()` 呢？只有 `socket` 知道自己什么时候准备好，所以 `socket` 需要在准备好的时候 “通知” `ThreadPool` 重新 `poll()`。这个操作叫做 `wake` （唤醒），这意味着，我们要给 `socket` 提供通知 `ThreadPool` 的方法 —— 让 `socket` 拿着 `Arc<ThreadPool>`。完美。
-
 在这个例子里 `ThreadPool` 实现了 `Executor`。我们来看看这个东西的定义：
 
 ```rust
@@ -67,6 +65,8 @@ pub trait Executor {
 这里说个题外话，因为 `TaskObj` 使用了动态派发 （`trait object`），所以目前这里的堆分配是必须的。然而我们还有另一套用于 `no_std` 的 `unsafe` 的解决方案可以避免堆分配，有兴趣的读者可以在原文拉到最后了解一下。在不久的将来，在 Rust 支持在栈上存储 `dynamic size type(DST)` 的时候 [[Merged] RFC 1909:unsized-rvalues](https://github.com/rust-lang/rfcs/blob/master/text/1909-unsized-rvalues.md)，这里的 `TaskObj` 也会取消，取而代之的是栈上的 `Task`，这也是现在取个这么难听名字的原因。
 
 ## `Wake`
+
+解决了 who 的问题，那还有 when 问题。我们让 `ThreadPool` 来负责重新 `poll()` ，那到底什么时候 `poll()` 呢？只有 `socket` 知道自己什么时候准备好，所以 `socket` 需要在准备好的时候 “通知” `ThreadPool` 重新 `poll()`。这个操作叫做 `wake` （唤醒），这意味着，我们要给 `socket` 提供通知 `ThreadPool` 的方法 —— 让 `socket` 拿着 `Arc<ThreadPool>`。完美。
 
 为了让 `socket` 能够唤醒 `Executor`，标准库提供了 `Wake`。`socket` 只需握着 `Wake`，就能在准备好的时候调用 `wake()`，通知 `Executor` 该 `poll()`了。 下面是 `Wake` 的定义：
 
