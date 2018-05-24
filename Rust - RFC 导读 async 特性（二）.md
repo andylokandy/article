@@ -146,7 +146,7 @@ impl Waker {
 `Pin<T>` 是指针类型，提供比 `&mut T` 更严格的规则：
 
 - `Pin<T: Unpin>` 和普通 `&mut T` 完全一样。
-- `Pin<T: !Unpin>` 只能提供 `Deref` 成 `&T`，以防止 T 被移动 (mem::replace())。
+- `Pin<T: !Unpin>` 只提供 `Deref<&T>`，以防止 T 被移动 (mem::replace())。
 
 我们来明确一下:
 
