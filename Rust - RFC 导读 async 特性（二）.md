@@ -10,7 +10,7 @@
 
 这篇文章将会深入 `async/await` 的实现原理，如果读者只是希望使用现成的库和 `async/await` 语法，仅看上一篇文章就已经足够了。而如果你希望开发使用异步实现的库，或者天生有着强烈的好奇心，那么这篇文章就是专门为你定做的。
 
-这篇 RFC 并不打算将整个 `futures-rs` 移入标准库，相反极力精简，仅仅加入必要的最基础的构件，把剩余的功能留给社区的库来实现。就算如此，我们也将迎来位帮数量众多的新朋友: `core::task::{Context, Poll, Wake, Waker, UnsafeWake, Executor, TaskObj, SpawnErrorKind, SpawnObjError}` 和 `core::ops::Async`。
+这篇 RFC 并不打算将整个 `futures-rs` 移入标准库，相反极力精简，仅仅加入必要的最基础的构件，把剩余的功能留给社区的库来实现。就算如此，我们也将迎来帮数量众多的新朋友: `core::task::{Context, Poll, Wake, Waker, UnsafeWake, Executor, TaskObj, SpawnErrorKind, SpawnObjError}` 和 `core::ops::Async`。
 
 如果加上另一篇 [RFC: 2349-pin](https://github.com/rust-lang/rfcs/blob/master/text/2349-pin.md)，那就还有 `core::marker::Unpin` 和 `core::mem::Pin`。
 
